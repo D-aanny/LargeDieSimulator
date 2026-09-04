@@ -2,9 +2,13 @@
 #include <random>
 #include <vector>
 #include <unordered_map>
+#include <QApplication>
+#include "mainwindow.h"
 
+// TODO: Move internal die logic to its own class
+// TODO: Fully implement customizability for die rolling parameters
 // Returns a random number with range [1, dieSize]
-int rollRandNum(const int dieSize)
+static int rollRandNum(const int dieSize)
 {
     std::random_device rd;
     std::mt19937 mt(rd());
@@ -13,7 +17,7 @@ int rollRandNum(const int dieSize)
     return (static_cast<int>(dist(mt)) % dieSize) + 1;
 }
 
-std::vector<int> runSingleTrial(const int numd4, const int numd6, const int numd8, const int numd10, const int numd12, const int numd20)
+static std::vector<int> runSingleTrial(const int numd4, const int numd6, const int numd8, const int numd10, const int numd12, const int numd20)
 {
     std::vector<int> rolledNums;
 
@@ -38,11 +42,11 @@ std::vector<int> runSingleTrial(const int numd4, const int numd6, const int numd
     return rolledNums;
 }
 
-bool hasTripleOrMore(const std::vector<int>& nums) {
+static bool hasTripleOrMore(const std::vector<int>& nums, int minNum) {
     std::unordered_map<int, int> countMap;
 
     for (int num : nums) {
-        //if (num >= 4)                                                         // Used to set current crit system where rolls must be 4 or higher to count for crit
+        //if (num >= minNum)                                                    // Used to set current crit system where rolls must be 4 or higher to count for crit
             countMap[num]++;
         if (countMap[num] >= 3) {
             std::cout << num << " has appeared 3 or more times." << std::endl;  // Found a number repeated 3 or more times
@@ -54,7 +58,7 @@ bool hasTripleOrMore(const std::vector<int>& nums) {
     return false;
 }
 
-bool hasDoubleMax(const std::vector<int>& nums, const int goalMax)
+static bool hasDoubleMax(const std::vector<int>& nums, const int goalMax)
 {
     int count = 0;
 
@@ -72,7 +76,7 @@ bool hasDoubleMax(const std::vector<int>& nums, const int goalMax)
     return false;
 }
 
-void runMultipleTrials(const int numd4, const int numd6, const int numd8, const int numd10, const int numd12, const int numd20, const int numTrials)
+static void runMultipleTrials(const int numd4, const int numd6, const int numd8, const int numd10, const int numd12, const int numd20, const int numTrials)
 {
     int numTrialsWithTripleCrit = 0;
     int numTrialsWithDblMaxCrit = 0;
@@ -95,12 +99,12 @@ void runMultipleTrials(const int numd4, const int numd6, const int numd8, const 
 
         std::cout << "Trial " << i + 1 << ": ";
 
-        for (int j = 0; j < trial.size(); j++)
-            std::cout << trial[j] << " ";
+        for (const int j : trial)
+            std::cout << j << " ";
 
         std::cout << std::endl;
 
-        if(hasTripleOrMore(trial))
+        if(hasTripleOrMore(trial, 0))
             numTrialsWithTripleCrit++;
 
         if (hasDoubleMax(trial, maxNumGoal))
@@ -118,28 +122,38 @@ void runMultipleTrials(const int numd4, const int numd6, const int numd8, const 
     std::cout << "Percentage of trials with critical hit via rolling double max = " << percentageWithCrit << "%" << std::endl;
 }
 
-int main()
+int main(int argc, char** argv)
 {
-    std::vector<int> numDiceIncluded;
-    int numd4, numd6, numd8, numd10, numd12, numd20;
+    QApplication application(argc, argv);
 
-    std::cout << "Please enter how many d4 you would like to roll: ";
-    std::cin >> numd4;
+    MainWindow window;
+    window.resize(500, 600);
+    window.show();
 
-    std::cout << "Please enter how many d6 you would like to roll: ";
-    std::cin >> numd6;
+    return QApplication::exec();
 
-    std::cout << "Please enter how many d8 you would like to roll: ";
-    std::cin >> numd8;
-
-    std::cout << "Please enter how many d10 you would like to roll: ";
-    std::cin >> numd10;
-
-    std::cout << "Please enter how many d12 you would like to roll: ";
-    std::cin >> numd12;
-
-    std::cout << "Please enter how many d20 you would like to roll: ";
-    std::cin >> numd20;
-
-    runMultipleTrials(numd4, numd6, numd8, numd10, numd12, numd20, 100000);
+    // =================================================================================================
+    // std::vector<int> numDiceIncluded;
+    // int numd4, numd6, numd8, numd10, numd12, numd20;
+    //
+    // std::cout << "Please enter how many d4 you would like to roll: ";
+    // std::cin >> numd4;
+    //
+    // std::cout << "Please enter how many d6 you would like to roll: ";
+    // std::cin >> numd6;
+    //
+    // std::cout << "Please enter how many d8 you would like to roll: ";
+    // std::cin >> numd8;
+    //
+    // std::cout << "Please enter how many d10 you would like to roll: ";
+    // std::cin >> numd10;
+    //
+    // std::cout << "Please enter how many d12 you would like to roll: ";
+    // std::cin >> numd12;
+    //
+    // std::cout << "Please enter how many d20 you would like to roll: ";
+    // std::cin >> numd20;
+    //
+    // runMultipleTrials(numd4, numd6, numd8, numd10, numd12, numd20, 10000);
+    // =================================================================================================
 }
