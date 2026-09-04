@@ -8,3 +8,5 @@ LargeDieSimulator is a C++/Qt 6 application intended for situations where manual
 **Work in progress**
 
 The GUI framework is in place, but the backend logic has not yet been connected. That being said, most of the core functionality is available through the command line.
+
+![Current GUI](CurrentGUI.png)
